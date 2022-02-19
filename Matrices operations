@@ -1,0 +1,766 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <cstring>
+
+using namespace std;
+
+// Global Functions
+
+int number_digits(float input)
+{
+if (input < 10) return 1;
+if (input < 100) return 2;
+if (input < 1000) return 3;
+if (input < 10000) return 4;
+if (input < 100000) return 5;
+else return 6;
+}
+
+
+char *removeSpaces(char *str) 
+{ 
+    int i = 0, j = 0; 
+    while (str[i]) 
+    { 
+        if (str[i] != ' ') 
+           str[j++] = str[i]; 
+        i++; 
+    } 
+    str[j] = '\0'; 
+    return str; 
+} 
+
+
+
+//to trim spaces from the begin and end of a text
+string space_trimer(string text)
+{
+
+        // to trim extra start spaces
+        int spaceStarter = 0;
+
+        while(1)
+        {
+        if(text.substr(spaceStarter,1) == " ")
+        {
+            spaceStarter++;
+        }
+        else break;
+        }
+
+        string start_trimed = text.substr(spaceStarter,text.length() - spaceStarter);
+
+        // to trim extra ending spaces
+        spaceStarter = start_trimed.length()-1;
+        int counter = 0;
+        while(1)
+        {
+        if(start_trimed.substr(spaceStarter,1) == " ")
+        {
+            counter ++;
+            spaceStarter--;
+        }
+        else break;
+        }
+        string all_trimed = start_trimed.substr(0, start_trimed.length() - counter);
+
+     return all_trimed ;
+}
+// Global Functions
+
+
+
+//count number of chars in a string
+int number_of(int e, string s,string c)
+{
+int N=0;
+
+for (int i=0;i<=e;i++)
+    {
+    if(s.substr(i,1)==c)
+    N++;
+    }
+    return N;
+
+}
+// Global Functions
+
+
+// Matrix class
+class matrix
+{
+    public:
+    
+    // members
+    int rows,cols ;
+	double elements[100][100];
+
+	string name;
+    // members
+
+
+ // methods
+void fill_matrix(string inputString)
+{
+
+
+string newString = space_trimer(inputString); // remove spaces
+
+
+// getting the name of the matrix
+string name = newString.substr(0,1);
+
+// to remove brackets
+int bracketFinder = newString.find("[",0);
+string newString2;
+if( newString[newString.length()-1] != ';' )
+newString2 = newString.substr(bracketFinder+1, newString.length()-bracketFinder-2);
+else
+newString2 = newString.substr(bracketFinder+1, newString.length()-bracketFinder-3);
+
+
+int rows;
+int columns;
+rows = number_of(newString2.length(),newString2, ";") + 1;
+
+// new Edit ...
+if( newString[newString.length()-3] == ';' )
+    rows --;
+
+
+
+// substring the string into row
+int beginRow = 0 ; // position of a row starting
+int endRow; // position of a row ending
+string row ;
+for(int i = 0 ; i < rows ; i ++)
+{
+    endRow = newString2.find(";",beginRow);
+    row = newString2.substr(beginRow , endRow - beginRow);
+    string newRow = space_trimer(row); // to remove beginning spaces
+    beginRow = endRow+1; // update the begin of next find
+
+    // now to get the number of columns
+    if(i == 0)// to create the matrix once since i now can get number of columns
+    {
+    columns = number_of(newRow.length(),newRow," ") + 1;
+
+
+    this -> rows = rows;
+    this -> cols = columns;
+
+    //this -> reset_matrix(rows,columns);
+    }
+    else{
+      int newcolumn=number_of(newRow.length(),newRow," ") + 1;
+      if(newcolumn!=columns) throw(2);
+    }
+    // substring the row into elements
+    int beginElement = 0;
+    int endElement;
+    string elementString;
+    float elementFloat;
+    for(int j = 0 ; j < columns ; j++)
+    {
+       endElement = newRow.find(" " ,beginElement);
+       elementString = newRow.substr(beginElement, endElement - beginElement);
+       beginElement = endElement +1;
+       elementFloat = strtof((elementString).c_str(),0); // string to float
+       // save the element to the matrix
+       this -> elements[i][j] = elementFloat;
+    }
+
+}
+
+   this -> name = name;
+
+}
+
+
+
+ void print_matrix()
+{
+    int rows = this -> rows;
+    int columns = this-> cols;
+
+    cout << this->name << " = " << endl;
+	for(int i=0;i< rows;i++){
+		for(int j=0;j<columns;j++){
+
+            switch(number_digits(elements[i][j]))
+           {
+
+            case 1:
+			std::cout <<"    \t" << std::fixed << std::setprecision(4) << elements[i][j] ; //4 digits like matlab 😀
+			break;
+
+            case 2:
+		    std::cout <<"   \t" << std::fixed << std::setprecision(4) << elements[i][j] ;//4 digits like matlab 😀
+			break;
+
+			case 3:
+		    std::cout <<"  \t" << std::fixed << std::setprecision(4) << elements[i][j]; //4 digits like matlab 😀
+			break;
+
+			case 4:
+		    std::cout <<" \t" << std::fixed << std::setprecision(4) << elements[i][j]; //4 digits like matlab 😀
+			break;
+
+			default:
+            std::cout <<"\t" << std::fixed << std::setprecision(4) << elements[i][j]; //4 digits like matlab 😀
+           }
+
+		}
+		cout<<endl;
+	}
+}
+
+ 
+void unity_matrix()
+{
+  //  if ( rows != columns || rows ==0 || columns==0 )
+    //    return;
+if(rows != cols) cout << "Error in sizes";
+if(rows==0 || cols==0) throw(9);
+for(int i = 0 ; i < rows ; i++)
+        for(int j=0 ; j < cols ; j++)
+            if(i == j)
+            elements[i][j] = 1;
+        else
+            elements[i][j] = 0;
+}
+
+
+
+void empty_matrix()
+{
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0 ; j < cols ; j++)
+            elements[i][j]=0;
+	}
+
+}
+
+
+matrix inverse()
+{
+
+  if(rows != cols) cout <<"Error in sizes";
+    
+    matrix temp;
+    temp = *this;
+    matrix u;
+    u.rows = temp.rows;
+    u.cols = temp.cols;
+    u.unity_matrix();
+    int n = rows;
+    int i,j,k;
+    float d;
+    for(i=n-1;i>0;i--)
+    {
+        if (temp.elements[i-1][i-1]==0)
+        for(j=0;j<n;j++)
+        {
+            d=temp.elements[i][j];
+            temp.elements[i][j]=temp.elements[i-1][j];
+            temp.elements[i-1][j]=d;
+            d=u.elements[i][j];
+            u.elements[i][j]=u.elements[i-1][j];
+            u.elements[i-1][j]=d;
+        }
+    }
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        if(j!=i)
+        {
+            d=temp.elements[j][i]/temp.elements[i][i];
+            for(k=0;k<n;k++)
+            {
+                temp.elements[j][k]-=temp.elements[i][k]*d;
+                u.elements[j][k]-=u.elements[i][k]*d;
+            }
+        }
+    }
+    for(i=0;i<n;i++)
+    {
+    d=temp.elements[i][i];
+    if(d==0) cout << "Determinant = 0";
+        for(j=0;j<n;j++)
+        {
+            temp.elements[i][j]=temp.elements[i][j]/d;
+            u.elements[i][j]=u.elements[i][j]/d;
+        }
+    }
+    return u;
+
+    
+}
+
+
+// methods
+
+
+};
+// Matrix class
+
+
+ void sum_matrix(matrix &C, matrix &A , matrix &B)
+ {
+   if(A.rows !=B.rows || A.cols != B.cols) cout << "Error in sizes";
+			 for (int i = 0; i < A.rows; i++)
+			 {
+				 for (int j = 0; j < A.cols; j++)
+					 C.elements[i][j] = A.elements[i][j] + B.elements[i][j];
+			 }
+
+ }
+
+
+
+ void sub_matrix(matrix &C, matrix &A , matrix &B)
+ {
+   if(A.rows !=B.rows || A.cols != B.cols) cout << "Error in sizes";
+			 for (int i = 0; i < A.rows; i++)
+			 {
+				 for (int j = 0; j < A.cols; j++)
+					 C.elements[i][j] = A.elements[i][j] - B.elements[i][j];
+			 }
+
+ }
+
+
+
+
+
+void multiply_matrix(matrix &C, matrix &A , matrix &B)
+{
+    C.empty_matrix();
+    
+
+    if (A.cols!=B.rows) cout << "Error in sizes";
+
+    // Multiplying and store in r
+     for (int i=0;i<A.rows;i++){
+        for (int j=0;j<B.cols;j++){
+            for (int k=0;k<A.cols;k++){
+                C.elements[i][j] += A.elements[i][k]*B.elements[k][j];
+            }
+        }
+    }
+
+}
+
+
+
+ void transpose_matrix(matrix &C, matrix &A)
+ {
+        C.rows = A.cols;
+        C.cols = A.rows;
+        
+    for(int i=0;i< C.rows;i++)
+  {
+    for(int k=0;k< C.cols;k++)
+    {
+      C.elements[i][k] = A.elements[k][i];
+    }
+  
+      
+  }
+        
+ }
+
+
+void divide_matrix(matrix &C, matrix &A , matrix &B)
+{
+    
+  if(B.cols != B.rows || A.cols != B.rows) 
+    cout << "Error in sizes";
+  matrix b = B.inverse();
+  multiply_matrix(C, A , b);
+}
+
+
+int main()
+{
+    // input A = [1.2 2.2 3.1; -4.5 5.4 6.3; 2.3 5.24.7]
+
+    matrix mat[100];
+
+    string inputString[100];
+    getline(cin, inputString[0]);
+
+    //cin >> inputString;
+
+    // variables input part
+    int counter = 0;
+    while(inputString[counter].find("[") != std::string::npos )
+    {
+    mat[counter].fill_matrix(inputString[counter]);
+    counter++;
+    getline(cin, inputString[counter]);
+    }
+    
+    bool flag = 1;
+    
+    // operations input part
+    while(1)
+    {
+    
+    string operation;
+    
+    if(flag)    
+    {
+     operation = inputString[counter];
+    flag = 0;
+    }
+    
+    else
+    getline(cin, operation);
+    
+    char cstr[operation.size() + 1];
+	strcpy(cstr, operation.c_str());	// or pass &s[0]
+    
+    operation = removeSpaces(cstr);
+    
+    if(operation == "exit")
+        break;
+    
+    if(operation.length() == 1)
+        {
+            bool exist_flag = 0;
+            for(int i = 0 ; i <= counter ; i++)
+            {   
+                if(mat[i].name == operation)
+                {
+                    mat[i].print_matrix();
+                    exist_flag = 1;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!" <<endl;
+        }
+    
+    
+    // C=A+B
+    if(operation.find("+") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            string op2_name = operation.substr(4,1);
+
+            // for loop to find first operand
+            bool exist_flag = 0;
+            int i;
+            for(i = 0 ; i < counter ; i++)
+            {   
+                if(mat[i].name == op1_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+                
+            
+                
+            // for loop to find second operand
+            exist_flag = 0;
+            int j;
+            for(j = 0 ; j < counter ; j++)
+            {   
+                if(mat[j].name == op2_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+            
+            counter++;
+            mat[counter].name = result_name;
+            mat[counter].rows = mat[i].rows;
+            mat[counter].cols = mat[i].cols;
+                            
+            sum_matrix(mat[counter],mat[i],mat[j]);
+            mat[counter].print_matrix();
+            
+        }
+        
+    
+    
+    
+    // C=A-B
+    if(operation.find("-") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            string op2_name = operation.substr(4,1);
+
+            // for loop to find first operand
+            bool exist_flag = 0;
+            int i;
+            for(i = 0 ; i < counter ; i++)
+            {   
+                if(mat[i].name == op1_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+                
+            
+                
+            // for loop to find second operand
+            exist_flag = 0;
+            int j;
+            for(j = 0 ; j < counter ; j++)
+            {   
+                if(mat[j].name == op2_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+            
+            counter++;
+            mat[counter].name = result_name;
+            mat[counter].rows = mat[i].rows;
+            mat[counter].cols = mat[i].cols;
+                            
+            sub_matrix(mat[counter],mat[i],mat[j]);
+            mat[counter].print_matrix();
+            
+        }
+        
+    
+    
+    // C=A*B
+    if(operation.find("*") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            string op2_name = operation.substr(4,1);
+
+            // for loop to find first operand
+            bool exist_flag = 0;
+            int i;
+            for(i = 0 ; i < counter ; i++)
+            {   
+                if(mat[i].name == op1_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+                
+            
+                
+            // for loop to find second operand
+            exist_flag = 0;
+            int j;
+            for(j = 0 ; j < counter ; j++)
+            {   
+                if(mat[j].name == op2_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+            
+            counter++;
+            mat[counter].name = result_name;
+            mat[counter].rows = mat[i].rows;
+            mat[counter].cols = mat[i].cols;
+                            
+            multiply_matrix(mat[counter],mat[i],mat[j]);
+            mat[counter].print_matrix();
+            
+        }
+        
+    
+    
+    // C=A`
+    if(operation.find("`") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+
+            // for loop to find first operand
+            bool exist_flag = 0;
+            int i;
+            for(i = 0 ; i < counter ; i++)
+            {   
+                if(mat[i].name == op1_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+                
+            
+            counter++;
+            mat[counter].name = result_name;
+            mat[counter].rows = mat[i].rows;
+            mat[counter].cols = mat[i].cols;
+            
+            
+            transpose_matrix(mat[counter],mat[i]);
+            mat[counter].print_matrix();
+            
+        }
+        
+    
+    
+        
+    // C=A/B
+    if(operation.find("/") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            string op2_name = operation.substr(4,1);
+
+            // for loop to find first operand
+            bool exist_flag = 0;
+            int i;
+            for(i = 0 ; i < counter ; i++)
+            {   
+                if(mat[i].name == op1_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+                
+            
+                
+            // for loop to find second operand
+            exist_flag = 0;
+            int j;
+            for(j = 0 ; j < counter ; j++)
+            {   
+                if(mat[j].name == op2_name)
+                {
+                    exist_flag = 1;
+                    break;
+                }
+            }
+            
+            if(!exist_flag)
+                cout << "This variable does not exist!"<< endl;
+            
+            counter++;
+            mat[counter].name = result_name;
+            mat[counter].rows = mat[i].rows;
+            mat[counter].cols = mat[i].cols;
+                            
+            divide_matrix(mat[counter],mat[i],mat[j]);
+            mat[counter].print_matrix();
+            
+        }
+        
+    
+    
+    
+    
+    
+    /*    
+            if(operation.find("-") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            string op2_name = operation.substr(4,1);
+            
+            result_mat.name = result_name;
+            result_mat.rows = mat1.rows;
+            result_mat.cols = mat1.cols;
+            
+            sub_matrix(result_mat,mat1,mat2);
+            
+            result_mat.print_matrix();
+            
+        }
+        
+        
+        
+        if(operation.find("*") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            string op2_name = operation.substr(4,1);
+            
+            result_mat.name = result_name;
+            result_mat.rows = mat1.rows;
+            result_mat.cols = mat2.cols;
+            
+            multiply_matrix(result_mat,mat1,mat2);
+            
+            result_mat.print_matrix();
+            
+        }
+        
+        
+        
+              if(operation.find("`") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            
+            result_mat.name = result_name;
+            
+            transpose_matrix(result_mat,mat1);
+            
+            result_mat.print_matrix();
+            
+        }
+        
+          
+        
+        if(operation.find("/") != std::string::npos)
+        {
+            string result_name = operation.substr(0,1);
+            string op1_name = operation.substr(2,1);
+            string op2_name = operation.substr(4,1);
+            
+            result_mat.name = result_name;
+            result_mat.rows = mat1.rows;
+            result_mat.cols = mat2.cols;
+            
+            divide_matrix(result_mat,mat1,mat2);
+            
+            result_mat.print_matrix();
+            
+        }
+        
+      */  
+    
+    }
+
+    return 0;
+}
